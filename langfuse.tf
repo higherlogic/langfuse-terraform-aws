@@ -217,6 +217,7 @@ resource "helm_release" "langfuse" {
     aws_iam_role.langfuse_irsa,
     aws_iam_role_policy.langfuse_s3_access,
     aws_eks_fargate_profile.namespaces,
+    null_resource.patch_coredns,
     kubernetes_persistent_volume.clickhouse_data,
     kubernetes_persistent_volume.clickhouse_zookeeper,
     kubernetes_service_account.aws_load_balancer_controller,

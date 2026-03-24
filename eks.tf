@@ -7,6 +7,10 @@ resource "aws_eks_cluster" "langfuse" {
   role_arn = aws_iam_role.eks.arn
   version  = var.kubernetes_version
 
+  access_config {
+    authentication_mode = "API_AND_CONFIG_MAP"
+  }
+
   vpc_config {
     subnet_ids              = local.private_subnets
     endpoint_private_access = true
@@ -86,6 +90,27 @@ resource "aws_eks_fargate_profile" "namespaces" {
   tags = {
     Name = local.tag_name
   }
+}
+
+# CoreDNS ships without a Fargate toleration; patch it so it can schedule on Fargate-only clusters.
+resource "null_resource" "patch_coredns" {
+  triggers = {
+    cluster_name = aws_eks_cluster.langfuse.name
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      aws eks update-kubeconfig --name ${aws_eks_cluster.langfuse.name} --region ${data.aws_region.current.id} --kubeconfig /tmp/kubeconfig-${aws_eks_cluster.langfuse.name}
+      KUBECONFIG=/tmp/kubeconfig-${aws_eks_cluster.langfuse.name} \
+        kubectl patch deployment coredns -n kube-system --type=json \
+        -p='[{"op":"add","path":"/spec/template/spec/tolerations/-","value":{"key":"eks.amazonaws.com/compute-type","operator":"Equal","value":"fargate","effect":"NoSchedule"}}]'
+      rm -f /tmp/kubeconfig-${aws_eks_cluster.langfuse.name}
+    EOT
+  }
+
+  depends_on = [
+    aws_eks_fargate_profile.namespaces
+  ]
 }
 
 resource "aws_security_group" "eks" {

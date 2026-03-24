@@ -136,6 +136,12 @@ variable "langfuse_helm_chart_version" {
   default     = "1.5.14"
 }
 
+variable "helm_timeout" {
+  description = "Timeout in seconds for Helm release operations (install/upgrade/rollback/delete). Fargate-based deployments need longer than the 300s default."
+  type        = number
+  default     = 900
+}
+
 # Resource configuration variables
 variable "langfuse_cpu" {
   description = "CPU allocation for Langfuse containers"

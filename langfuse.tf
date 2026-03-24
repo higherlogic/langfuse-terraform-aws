@@ -202,6 +202,7 @@ resource "helm_release" "langfuse" {
   version    = var.langfuse_helm_chart_version
   chart      = "langfuse"
   namespace  = kubernetes_namespace.langfuse.metadata[0].name
+  timeout    = var.helm_timeout
 
   values = compact([
     local.langfuse_values,

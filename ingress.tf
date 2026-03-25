@@ -338,3 +338,30 @@ resource "helm_release" "aws_load_balancer_controller" {
     null_resource.patch_coredns,
   ]
 }
+
+# ALB controller chart v1.7.1 does not support dnsConfig in values.
+# Patch the deployment to set ndots=2 so that absolute names like
+# sts.us-east-1.amazonaws.com (4 dots) are resolved before search
+# domain suffixes, avoiding the *.higherlogic.com wildcard catch-all.
+resource "null_resource" "patch_alb_controller_dns" {
+  count = var.skip_kubernetes ? 0 : 1
+
+  triggers = {
+    cluster_name = aws_eks_cluster.langfuse.name
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      aws eks update-kubeconfig --name ${aws_eks_cluster.langfuse.name} --region ${data.aws_region.current.id} --kubeconfig /tmp/kubeconfig-${aws_eks_cluster.langfuse.name}
+      KUBECONFIG=/tmp/kubeconfig-${aws_eks_cluster.langfuse.name} \
+        kubectl patch deployment aws-load-balancer-controller -n kube-system --type=strategic \
+        -p='{"spec":{"template":{"spec":{"dnsConfig":{"options":[{"name":"ndots","value":"2"}]}}}}}'
+      rm -f /tmp/kubeconfig-${aws_eks_cluster.langfuse.name}
+    EOT
+  }
+
+  depends_on = [
+    helm_release.aws_load_balancer_controller,
+    null_resource.patch_coredns,
+  ]
+}

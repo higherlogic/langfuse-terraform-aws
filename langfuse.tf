@@ -4,6 +4,10 @@ locals {
 global:
   defaultStorageClass: efs
 langfuse:
+  dnsConfig:
+    options:
+      - name: ndots
+        value: "2"
   salt:
     secretKeyRef:
       name: langfuse
@@ -224,6 +228,7 @@ resource "helm_release" "langfuse" {
     aws_iam_role_policy.langfuse_s3_access,
     aws_eks_fargate_profile.namespaces,
     null_resource.patch_coredns,
+    null_resource.patch_alb_controller_dns,
     kubernetes_persistent_volume.clickhouse_data,
     kubernetes_persistent_volume.clickhouse_zookeeper,
     kubernetes_service_account.aws_load_balancer_controller,

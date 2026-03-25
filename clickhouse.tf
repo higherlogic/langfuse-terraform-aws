@@ -58,7 +58,7 @@ resource "aws_efs_access_point" "zookeeper" {
 
 # Create the Clickhouse PVs
 resource "kubernetes_persistent_volume" "clickhouse_data" {
-  count = var.clickhouse_instance_count
+  count = var.skip_kubernetes ? 0 : var.clickhouse_instance_count
 
   metadata {
     name = "clickhouse-data-${count.index}"
@@ -71,7 +71,7 @@ resource "kubernetes_persistent_volume" "clickhouse_data" {
     volume_mode                      = "Filesystem"
     access_modes                     = ["ReadWriteOnce"]
     persistent_volume_reclaim_policy = "Retain"
-    storage_class_name               = kubernetes_storage_class.efs.metadata[0].name
+    storage_class_name               = kubernetes_storage_class.efs[0].metadata[0].name
     persistent_volume_source {
       csi {
         driver        = "efs.csi.aws.com"
@@ -90,7 +90,7 @@ resource "kubernetes_persistent_volume" "clickhouse_data" {
 }
 
 resource "kubernetes_persistent_volume" "clickhouse_zookeeper" {
-  count = var.clickhouse_instance_count
+  count = var.skip_kubernetes ? 0 : var.clickhouse_instance_count
 
   metadata {
     name = "clickhouse-zookeeper-${count.index}"
@@ -103,7 +103,7 @@ resource "kubernetes_persistent_volume" "clickhouse_zookeeper" {
     volume_mode                      = "Filesystem"
     access_modes                     = ["ReadWriteOnce"]
     persistent_volume_reclaim_policy = "Retain"
-    storage_class_name               = kubernetes_storage_class.efs.metadata[0].name
+    storage_class_name               = kubernetes_storage_class.efs[0].metadata[0].name
     persistent_volume_source {
       csi {
         driver        = "efs.csi.aws.com"

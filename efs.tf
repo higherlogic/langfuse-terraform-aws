@@ -119,6 +119,8 @@ resource "aws_iam_role_policy_attachment" "efs" {
 }
 
 resource "kubernetes_storage_class" "efs" {
+  count = var.skip_kubernetes ? 0 : 1
+
   metadata {
     name = "efs"
   }

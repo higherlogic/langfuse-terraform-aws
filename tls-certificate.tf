@@ -45,8 +45,10 @@ resource "aws_acm_certificate_validation" "cert" {
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }
 
-# Get the ALB details
+# Get the ALB details (only after helm releases create the ingress)
 data "aws_lb" "ingress" {
+  count = var.skip_kubernetes ? 0 : 1
+
   tags = {
     "elbv2.k8s.aws/cluster"    = var.name
     "ingress.k8s.aws/stack"    = "langfuse/langfuse"
@@ -61,13 +63,15 @@ data "aws_lb" "ingress" {
 
 # Create Route53 record for the ALB
 resource "aws_route53_record" "langfuse" {
+  count = var.skip_kubernetes ? 0 : 1
+
   zone_id = aws_route53_zone.zone.zone_id
   name    = var.domain
   type    = "A"
 
   alias {
-    name                   = data.aws_lb.ingress.dns_name
-    zone_id                = data.aws_lb.ingress.zone_id
+    name                   = data.aws_lb.ingress[0].dns_name
+    zone_id                = data.aws_lb.ingress[0].zone_id
     evaluate_target_health = true
   }
 }

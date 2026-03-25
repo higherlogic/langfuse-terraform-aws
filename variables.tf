@@ -221,6 +221,12 @@ variable "ingress_inbound_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "skip_kubernetes" {
+  description = "When true, create only AWS infrastructure (EKS cluster, RDS, Redis, S3, EFS, IAM, Route53, ACM) without deploying Kubernetes/Helm workloads. Use for bootstrapping a new environment where the EKS cluster must exist before the kubernetes/helm providers can be configured."
+  type        = bool
+  default     = false
+}
+
 variable "redis_at_rest_encryption" {
   description = "Whether at-rest encryption is enabled for the Redis cluster"
   type        = bool

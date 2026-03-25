@@ -128,11 +128,11 @@ langfuse:
       - path: /
         pathType: Prefix
 EOT
-  encryption_values = var.use_encryption_key == false ? "" : <<EOT
+  encryption_values = var.use_encryption_key == false || var.skip_kubernetes ? "" : <<EOT
 langfuse:
   encryptionKey:
     secretKeyRef:
-      name: ${kubernetes_secret.langfuse.metadata[0].name}
+      name: ${kubernetes_secret.langfuse[0].metadata[0].name}
       key: encryption_key
 EOT
 
@@ -159,6 +159,8 @@ EOT
 }
 
 resource "kubernetes_namespace" "langfuse" {
+  count = var.skip_kubernetes ? 0 : 1
+
   metadata {
     name = "langfuse"
   }
@@ -181,6 +183,8 @@ resource "random_bytes" "encryption_key" {
 }
 
 resource "kubernetes_secret" "langfuse" {
+  count = var.skip_kubernetes ? 0 : 1
+
   metadata {
     name      = "langfuse"
     namespace = "langfuse"
@@ -197,11 +201,13 @@ resource "kubernetes_secret" "langfuse" {
 }
 
 resource "helm_release" "langfuse" {
+  count = var.skip_kubernetes ? 0 : 1
+
   name       = "langfuse"
   repository = "https://langfuse.github.io/langfuse-k8s"
   version    = var.langfuse_helm_chart_version
   chart      = "langfuse"
-  namespace  = kubernetes_namespace.langfuse.metadata[0].name
+  namespace  = kubernetes_namespace.langfuse[0].metadata[0].name
   timeout    = var.helm_timeout
 
   values = compact([

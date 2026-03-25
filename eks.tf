@@ -95,6 +95,8 @@ resource "aws_eks_fargate_profile" "namespaces" {
 
 # CoreDNS ships without a Fargate toleration; patch it so it can schedule on Fargate-only clusters.
 resource "null_resource" "patch_coredns" {
+  count = var.skip_kubernetes ? 0 : 1
+
   triggers = {
     cluster_name = aws_eks_cluster.langfuse.name
   }

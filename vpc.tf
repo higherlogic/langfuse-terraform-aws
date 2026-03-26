@@ -99,7 +99,7 @@ resource "aws_vpc_endpoint" "sts" {
   subnet_ids         = local.private_subnets
   security_group_ids = [aws_security_group.vpc_endpoints.id]
 
-  private_dns_enabled = true
+  private_dns_enabled = false
 
   tags = {
     Name = "${local.tag_name} STS VPC Endpoint"

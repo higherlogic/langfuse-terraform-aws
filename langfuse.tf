@@ -214,6 +214,8 @@ resource "helm_release" "langfuse" {
   namespace  = kubernetes_namespace.langfuse[0].metadata[0].name
   timeout    = var.helm_timeout
 
+  force_update = var.helm_force_update
+
   values = compact([
     local.langfuse_values,
     local.ingress_values,

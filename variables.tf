@@ -142,6 +142,12 @@ variable "helm_timeout" {
   default     = 900
 }
 
+variable "helm_force_update" {
+  description = "Force Helm release update through delete/recreate if needed. Useful when Kubernetes strategic merge patches fail on env var value changes."
+  type        = bool
+  default     = false
+}
+
 # Resource configuration variables
 variable "langfuse_cpu" {
   description = "CPU allocation for Langfuse containers"

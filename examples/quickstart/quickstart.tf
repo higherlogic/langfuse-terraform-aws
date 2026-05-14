@@ -15,7 +15,7 @@ module "langfuse" {
   use_single_nat_gateway = false # Using a single NAT gateway decreases costs, but is less resilient
 
   # Optional: Configure the Kubernetes cluster
-  kubernetes_version         = "1.32"
+  kubernetes_version         = "1.33"
   fargate_profile_namespaces = ["kube-system", "langfuse", "default"]
 
   # Optional: Configure the database instances

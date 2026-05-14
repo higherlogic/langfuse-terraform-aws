@@ -30,7 +30,7 @@ module "langfuse" {
   use_single_nat_gateway = false  # Using a single NAT gateway decreases costs, but is less resilient
 
   # Optional: Configure the Kubernetes cluster
-  kubernetes_version = "1.32"
+  kubernetes_version = "1.33"
   fargate_profile_namespaces = ["kube-system", "langfuse", "default"]
 
   # Optional: Configure the database instances
@@ -291,7 +291,7 @@ This module creates a complete Langfuse stack with the following components:
 | public_subnet_ids            | List of public subnet IDs (required when using existing VPC)                                                     | list(string) | null                                   |    no    |
 | private_route_table_ids      | List of private route table IDs (optional when using existing VPC, for S3 VPC Gateway endpoint)                   | list(string) | null                                   |    no    |
 | use_single_nat_gateway       | To use a single NAT Gateway (cheaper) or one per AZ (more resilient)                                             | bool         | true                                   |    no    |
-| kubernetes_version           | Kubernetes version for EKS cluster                                                                               | string       | "1.32"                                 |    no    |
+| kubernetes_version           | Kubernetes version for EKS cluster                                                                               | string       | "1.33"                                 |    no    |
 | use_encryption_key           | Whether to use an Encryption key for LLM API credential and integration credential store                         | bool         | true                                   |    no    |
 | fargate_profile_namespaces   | List of namespaces to create Fargate profiles for                                                                | list(string) | ["default", "langfuse", "kube-system"] |    no    |
 | postgres_instance_count      | Number of PostgreSQL instances                                                                                   | number       | 2                                      |    no    |

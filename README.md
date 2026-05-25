@@ -33,6 +33,13 @@ module "langfuse" {
   kubernetes_version = "1.33"
   fargate_profile_namespaces = ["kube-system", "langfuse", "default"]
 
+  # Optional: Restrict EKS API endpoint exposure.
+  # Set eks_endpoint_public_access = false to satisfy AWS Security Hub control EKS.1.
+  # When disabled, Terraform / kubectl / Helm must run from inside the VPC (or a peered/VPN
+  # network with private DNS resolution to the cluster endpoint).
+  eks_endpoint_public_access       = true
+  eks_endpoint_public_access_cidrs = []  # e.g. ["198.51.100.0/24"] to limit public access to specific CIDRs
+
   # Optional: Configure the database instances
   postgres_instance_count = 2
   postgres_min_capacity = 0.5

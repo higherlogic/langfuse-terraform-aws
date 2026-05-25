@@ -15,7 +15,8 @@ resource "aws_eks_cluster" "langfuse" {
   vpc_config {
     subnet_ids              = local.private_subnets
     endpoint_private_access = true
-    endpoint_public_access  = true
+    endpoint_public_access  = var.eks_endpoint_public_access
+    public_access_cidrs     = var.eks_endpoint_public_access ? (length(var.eks_endpoint_public_access_cidrs) > 0 ? var.eks_endpoint_public_access_cidrs : ["0.0.0.0/0"]) : null
     security_group_ids      = [aws_security_group.eks.id]
   }
 

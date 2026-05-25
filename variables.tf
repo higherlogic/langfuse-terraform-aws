@@ -60,6 +60,18 @@ variable "kubernetes_version" {
   default     = "1.33"
 }
 
+variable "eks_endpoint_public_access" {
+  description = "Whether the EKS cluster API server endpoint is publicly accessible. Set to false to satisfy AWS Security Hub control EKS.1; requires Terraform/kubectl/Helm to run from inside the VPC (or a peered/VPN network)."
+  type        = bool
+  default     = true
+}
+
+variable "eks_endpoint_public_access_cidrs" {
+  description = "List of CIDR blocks that can access the public EKS API endpoint. Ignored when eks_endpoint_public_access is false. Defaults to 0.0.0.0/0 (AWS default) when empty."
+  type        = list(string)
+  default     = []
+}
+
 variable "use_encryption_key" {
   description = "Whether to use an Encryption key for LLM API credential and integration credential store"
   type        = bool

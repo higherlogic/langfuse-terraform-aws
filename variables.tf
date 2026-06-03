@@ -245,6 +245,12 @@ variable "redis_multi_az" {
   default     = false
 }
 
+variable "bedrock_invoke_enabled" {
+  description = "When true, grant the Langfuse IRSA role bedrock:InvokeModel* on Anthropic foundation models and us.anthropic.* inference profiles in this account (for Langfuse playground/evals Bedrock connections)."
+  type        = bool
+  default     = true
+}
+
 # Additional environment variables
 variable "additional_env" {
   description = "Additional environment variables to set on Langfuse pods"
